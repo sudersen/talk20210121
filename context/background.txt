@@ -1,0 +1,8 @@
+package context
+
+// START OMIT
+// Background returns an empty Context. It is never canceled, has no deadline,
+// and has no values. Background is typically used in main, init, and tests,
+// and as the top-level Context for incoming requests.
+func Background() Context
+// END OMIT

@@ -1,0 +1,6 @@
+package context
+
+// START OMIT
+// WithValue returns a copy of parent whose Value method returns val for key.
+func WithValue(parent Context, key interface{}, val interface{}) Context
+// END OMIT

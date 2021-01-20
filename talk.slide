@@ -1,0 +1,95 @@
+Context 101
+21 Jan 2021
+Tags: go golang grpc rest context
+
+Sudersen Archakam
+sudersen@yandex.com
+@sudersens
+Download the presentation from [[https://github.com/sudersen/talk20200625][github.com/sudersen/
+
+
+]]
+
+* Context?
+.image 2020.jpg
+
+* Significance
+- Request scoped values
+
+- Cancellation Signals
+
+- Deadline and timeouts
+
+* Context API in Golang
+
+- A context carries request-scoped values, deadline/timeouts and cancellation signal across API boundaries
+
+- *concurrency-safe* with multiple goroutines in action simultaneously
+
+* Context interface
+
+.code context/context.go /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts
+
+The context package provides functions to derive new Context values from existing ones. These values form a tree: when a Context is canceled, all Contexts derived from it are also canceled.
+
+* Root context: Background()
+- Background is the root of any Context tree
+- it is never canceled
+.code context/background.txt /START OMIT/,/END OMIT/ HLxxx
+
+* Root context: Background()
+.code exampletimeout/main.go /^func main/,/^}/
+
+* Derived contexts: WithCancel() /WithTimeout()
+.code context/cancellable.txt /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithTimeout()
+.play exampletimeout/main.go /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithTimeout()
+.play examplenotimeout/main.go /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithDeadline()
+- Pretty much same as **WithTimeout()*, but instead of stating relative time (After 5 seconds), it has to be an absolute time (2020-DEC-31 23:59:59)
+- ,i.e, define **time.Time* instead of **time.Duration*
+
+* Derived contexts: WithCancel()
+.play examplecancel/main.go /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithCancel()
+.play examplenocancel/main.go /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithValue()
+.code context/value.txt /START OMIT/,/END OMIT/ HLxxx
+
+* Derived contexts: WithValue()
+.play examplevalue/main.go /START OMIT/,/END OMIT/ HLxxx
+
+* DOs and DON'Ts with Context.Value
+- Context.Value is for informing and NOT CONTROLLING
+- Context.Value should NEVER be used for values that are not created and destroyed during the lifetime of the request
+
+* Graceful shutdown
+.code gracefulshutdown/main.go /START MAIN/,/END MAIN/ HLxxx
+
+* Graceful shutdown
+.play gracefulshutdown/main.go /START OMIT/,/END OMIT/ HLxxx
+: ps -ef | grep prog | grep present | awk '{print $2}' | xargs kill -2
+
+* Goods
+- Separates the core computation parameter from the operational parameters
+- Codifies common operational aspects and how to communicate across boundaries
+- Optimizes resource usage
+
+* Not so goods
+- No ack for cancellation
+- Avoids static type check
+- Bloats function signature
+
+* Best practices
+- Use it as FIRST parameter of the function /* func F(ctx context.Context, ...) */
+- A function which ISN'T request specific can use context.Background()
+- Contexts are immutable and it is OKAY to pass the ctx across multiple functions
+- Context should always be flowing; NEVER persist the context anywhere

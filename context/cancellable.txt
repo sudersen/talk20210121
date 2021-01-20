@@ -1,0 +1,20 @@
+package context
+
+import "time"
+
+// START OMIT
+// WithCancel returns a copy of parent whose Done channel is closed as soon as
+// parent.Done is closed or cancel is called.
+func WithCancel(parent Context) (ctx Context, cancel CancelFunc)
+
+// A CancelFunc cancels a Context.
+type CancelFunc func()
+
+// START OMIT
+// WithTimeout returns a copy of parent whose Done channel is closed as soon as
+// parent.Done is closed, cancel is called, or timeout elapses. The new
+// Context's Deadline is the sooner of now+timeout and the parent's deadline, if
+// any. If the timer is still running, the cancel function releases its
+// resources.
+func WithTimeout(parent Context, timeout time.Duration) (Context, CancelFunc)
+// END OMIT
